@@ -2,24 +2,8 @@
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *"); 
 
-// Konfigurasi koneksi ke database
-$host     = "localhost";
-$user     = "tkjh7215_opengate";
-$password = "opengate123";
-$database = "tkjh7215_opengate";
-
-// Membuat koneksi
-$koneksi = new mysqli($host, $user, $password, $database);
-
-// Cek koneksi
-if ($koneksi->connect_error) {
-    http_response_code(500);
-    echo json_encode([
-        "status" => "error",
-        "message" => "Koneksi gagal: " . $koneksi->connect_error
-    ]);
-    exit();
-}
+// Include file koneksi
+require_once "db.php";
 
 // Cek parking log
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {

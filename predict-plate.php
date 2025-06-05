@@ -2,21 +2,8 @@
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *"); 
 
-// Konfigurasi koneksi ke database
-$host     = "localhost";
-$user     = "tkjh7215_opengate";
-$password = "opengate123";
-$database = "tkjh7215_opengate";
-
-$koneksi = new mysqli($host, $user, $password, $database);
-if ($koneksi->connect_error) {
-    http_response_code(500);
-    echo json_encode([
-        "status" => "error",
-        "message" => "Koneksi gagal: " . $koneksi->connect_error
-    ]);
-    exit();
-}
+// Include file koneksi
+require_once "db.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     $plate_number = $_POST['plate_number'] ?? null;  
