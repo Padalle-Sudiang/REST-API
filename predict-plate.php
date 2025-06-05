@@ -30,23 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         exit();
     }
 
-    // Simpan file gambar ke folder fisik
-    $upload_folder = __DIR__ . '/uploads/';
-    $timestamp = date("Ymd_His");
-    $sanitized_plate = preg_replace("/[^A-Za-z0-9]/", "", $plate_number);
-    $unique_name = $sanitized_plate . "_" . $timestamp . '.jpg';
-    $filename_server = $upload_folder . $unique_name;
-    $filename_url = 'http://tkj-3b.com/tkj-3b.com/opengate/uploads/' . $unique_name;
-
-    if (!move_uploaded_file($_FILES['image']['tmp_name'], $filename_server)) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Gagal menyimpan gambar."
-        ]);
-        exit();
-    }
-
-    // Cek apakah kendaraan sudah terdaftar
+     // Cek apakah kendaraan sudah terdaftar (SEBELUM simpan gambar)
     $stmt = $koneksi->prepare("SELECT id, is_member FROM vehicles WHERE plate_number = ?");
     $stmt->bind_param("s", $plate_number);
     $stmt->execute();
@@ -55,12 +39,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     $status = "new";
     $vehicle_id = null;
     $is_member = false;
+    $filename_url = null;
 
     if ($row = $result->fetch_assoc()) {
         $status = "existing";
         $vehicle_id = $row['id'];
         $is_member = (bool)$row['is_member'];
     } else {
+        // HANYA jika plat belum ada, simpan gambar
+        $upload_folder = __DIR__ . '/uploads/';
+        $timestamp = date("Ymd_His");
+        $sanitized_plate = preg_replace("/[^A-Za-z0-9]/", "", $plate_number);
+        $unique_name = $sanitized_plate . "_" . $timestamp . '.jpg';
+        $filename_server = $upload_folder . $unique_name;
+        $filename_url = 'http://tkj-3b.com/tkj-3b.com/opengate/uploads/' . $unique_name;
+
+        if (!move_uploaded_file($_FILES['image']['tmp_name'], $filename_server)) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Gagal menyimpan gambar."
+            ]);
+            exit();
+        }
+
         $stmt = $koneksi->prepare("INSERT INTO vehicles (plate_number, plate_type, is_member, image_path, created_at) VALUES (?, ?, 0, ?, NOW())");
         $stmt->bind_param("sss", $plate_number, $plate_type, $filename_url);
         $stmt->execute();
