@@ -4,6 +4,12 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *"); 
 header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS");
 
+// Tangani preflight request dari browser
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 // Include file koneksi
 require_once "db.php";
 
@@ -39,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $diff_hours = ceil(($exit - $entry_time) / 3600);
-    $total_fee = $diff_hours * 5000;  // Rp 5.000 per jam
+    $rate_per_hour = 3000;  // Ubah ke 3.000 per jam
+    $total_fee = $diff_hours * $rate_per_hour;
     $change = $amount_paid - $total_fee;
 
     // Update log parkir
