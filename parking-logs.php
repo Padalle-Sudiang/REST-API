@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     echo json_encode($stmt->get_result()->fetch_assoc());
   } else {
     $result = $koneksi->query("
-      SELECT v.plate_number, pl.entry_time, pl.exit_time, pl.parking_fee, pl.img_path
+      SELECT v.plate_number, pl.entry_time, pl.exit_time, pl.parking_fee, pl.img_path, pl.img_path_exit
       FROM parking_logs pl JOIN vehicles v ON v.id = pl.vehicle_id
     ");
     echo json_encode($result->fetch_all(MYSQLI_ASSOC));
