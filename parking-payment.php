@@ -1,14 +1,13 @@
 <?php  
 date_default_timezone_set('Asia/Makassar'); // Set timezone to Asia/Makassar
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *"); 
-header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS");
-
-// Tangani preflight request dari browser
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type");
     http_response_code(200);
     exit;
 }
+
 
 // Include file koneksi
 require_once "db.php";
@@ -27,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Waktu keluar berdasarkan server
     $exit_time = date("Y-m-d H:i:s");
-
+    
     // Ambil data kendaraan & log parkir aktif
     $stmt = $koneksi->prepare("SELECT v.id AS vehicle_id, pl.id AS log_id, pl.entry_time 
         FROM vehicles v
