@@ -29,11 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
 
     $vehicle_id = $res['id'];
 
-    // Cari log parkir yang sudah keluar tapi belum punya img_path_exit
+    // Cari log aktif terakhir yang belum punya gambar keluar
     $stmt = $koneksi->prepare("
-        SELECT id FROM parking_logs 
-        WHERE vehicle_id = ? AND exit_time IS NOT NULL AND img_path_exit IS NULL 
-        ORDER BY exit_time DESC LIMIT 1
+    SELECT id FROM parking_logs 
+    WHERE vehicle_id = ? AND img_path_exit IS NULL 
+    ORDER BY entry_time DESC LIMIT 1
     ");
     $stmt->bind_param("i", $vehicle_id);
     $stmt->execute();
