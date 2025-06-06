@@ -6,14 +6,13 @@ Sistem REST API untuk manajemen parkir kendaraan berbasis Raspberry Pi + Kamera 
 
 ## 📦 1. Endpoint: Capture & Prediksi Plat
 
-**POST** `/api/predict-plate`  
+**POST** `/opengate/predict-plate.php`  
 Mengirim gambar ke server Raspberry Pi untuk diproses oleh model ALPR.
 
 ### Request (multipart/form-data):
 ```http
-POST /api/predict-plate
+POST http://tkj-3b.com/tkj-3b.com/opengate/predict-plate.php
 Content-Type: multipart/form-data
 
 Body:
 - image: (file) gambar plat kendaraan hasil capture
-
