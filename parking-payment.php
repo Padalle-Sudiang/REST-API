@@ -15,9 +15,18 @@ require_once "db.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
+
+    // Validasi input
+    if (!isset($input['plate_number']) || !isset($input['amount_paid'])) {
+        echo json_encode(["error" => "Data tidak lengkap."]);
+        exit;
+    }
+
     $plate = $input['plate_number'];
-    $exit_time = $input['exit_time'];
     $amount_paid = $input['amount_paid'];
+
+    // Waktu keluar berdasarkan server
+    $exit_time = date("Y-m-d H:i:s");
 
     // Ambil data kendaraan & log parkir aktif
     $stmt = $koneksi->prepare("SELECT v.id AS vehicle_id, pl.id AS log_id, pl.entry_time 
@@ -45,8 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $diff_hours = ceil(($exit - $entry_time) / 3600);
-    $rate_per_hour = 3000;  // Ubah ke 3.000 per jam
-    $total_fee = $diff_hours * $rate_per_hour;
+    $total_fee = $diff_hours * 3000;  // Rp 3000 per jam
     $change = $amount_paid - $total_fee;
 
     // Update log parkir
