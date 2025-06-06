@@ -15,7 +15,7 @@ Body:
 curl -X POST http://tkj-3b.com/tkj-3b.com/opengate/api.php \
   -F "image=@mobil.jpg" \
   -F "plate_number=B1234XYZ" \
-  -F "plate_type=pribadi"
+  -F "plate_type=Plate Biasa"
 
 **Response (200 OK):**
 ```json
