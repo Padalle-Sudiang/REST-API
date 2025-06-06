@@ -33,23 +33,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         $status = "existing";
         $vehicle_id = $row['id'];
         $is_member = (bool)$row['is_member'];
-    } else {
-        // HANYA jika plat belum ada, simpan gambar
-        $upload_folder = __DIR__ . '/uploads/';
-        $timestamp = date("Ymd_His");
-        $sanitized_plate = preg_replace("/[^A-Za-z0-9]/", "", $plate_number);
-        $unique_name = $sanitized_plate . "_" . $timestamp . '.jpg';
-        $filename_server = $upload_folder . $unique_name;
-        $filename_url = 'http://tkj-3b.com/tkj-3b.com/opengate/uploads/' . $unique_name;
+    } 
 
-        if (!move_uploaded_file($_FILES['image']['tmp_name'], $filename_server)) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Gagal menyimpan gambar."
-            ]);
-            exit();
-        }
+    // Proses upload gambar (untuk semua kendaraan)
+    $upload_folder = __DIR__ . '/uploads/';
+    $timestamp = date("Ymd_His");
+    $sanitized_plate = preg_replace("/[^A-Za-z0-9]/", "", $plate_number);
+    $unique_name = $sanitized_plate . "_" . $timestamp . '.jpg';
+    $filename_server = $upload_folder . $unique_name;
+    $filename_url = 'http://tkj-3b.com/tkj-3b.com/opengate/uploads/' . $unique_name;
 
+    if (!move_uploaded_file($_FILES['image']['tmp_name'], $filename_server)) {
+    echo json_encode([
+        "status" => "error",
+        "message" => "Gagal menyimpan gambar."
+    ]);
+    exit();
+    }
+
+    if (!$vehicle_id) {
         $stmt = $koneksi->prepare("INSERT INTO vehicles (plate_number, plate_type, is_member, image_path, created_at) VALUES (?, ?, 0, ?, NOW())");
         $stmt->bind_param("sss", $plate_number, $plate_type, $filename_url);
         $stmt->execute();
