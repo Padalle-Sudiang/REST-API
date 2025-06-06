@@ -11,8 +11,10 @@ Mengirim gambar ke server Raspberry Pi untuk diproses oleh model ALPR.
 
 ### Request (multipart/form-data):
 ```http
-POST http://tkj-3b.com/tkj-3b.com/opengate/predict-plate.php
-Content-Type: multipart/form-data
-
 Body:
-- image: (file) gambar plat kendaraan hasil capture
+curl -X POST http://tkj-3b.com/tkj-3b.com/opengate/api.php \
+  -F "image=@mobil.jpg" \
+  -F "plate_number=B1234XYZ" \
+  -F "plate_type=pribadi"
+
+**Response (200 OK):**
