@@ -1,9 +1,10 @@
 <?php  
 date_default_timezone_set('Asia/Makassar'); // Set timezone to Asia/Makassar
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type");
     http_response_code(200);
     exit;
 }
