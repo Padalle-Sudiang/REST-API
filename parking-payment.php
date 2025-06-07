@@ -1,5 +1,5 @@
 <?php  
-date_default_timezone_set('Asia/Makassar'); // Set timezone to Asia/Makassar
+date_default_timezone_set('Asia/Makassar');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -9,27 +9,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-
-// Include file koneksi
 require_once "db.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
 
-    // Validasi input
-    if (!isset($input['plate_number']) || !isset($input['amount_paid'])) {
-        echo json_encode(["error" => "Data tidak lengkap."]);
+    if (!isset($input['plate_number'])) {
+        echo json_encode(["error" => "Plate number wajib diisi."]);
         exit;
     }
 
     $plate = $input['plate_number'];
-    $amount_paid = $input['amount_paid'];
-
-    // Waktu keluar berdasarkan server
     $exit_time = date("Y-m-d H:i:s");
-    
+
     // Ambil data kendaraan & log parkir aktif
-    $stmt = $koneksi->prepare("SELECT v.id AS vehicle_id, pl.id AS log_id, pl.entry_time 
+    $stmt = $koneksi->prepare("SELECT v.id AS vehicle_id, v.is_member, pl.id AS log_id, pl.entry_time 
         FROM vehicles v
         JOIN parking_logs pl ON v.id = pl.vehicle_id
         WHERE v.plate_number = ? AND pl.exit_time IS NULL
@@ -47,15 +41,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $log_id = $res['log_id'];
     $entry_time = strtotime($res['entry_time']);
     $exit = strtotime($exit_time);
+    $is_member = $res['is_member'];
 
     if ($exit <= $entry_time) {
         echo json_encode(["error" => "Waktu keluar tidak valid."]);
         exit;
     }
 
-    $diff_hours = ceil(($exit - $entry_time) / 3600);
-    $total_fee = $diff_hours * 3000;  // Rp 3000 per jam
-    $change = $amount_paid - $total_fee;
+    // Hitung fee dan uang dibayar
+    if ($is_member) {
+        $total_fee = 0;
+        $amount_paid = 0;
+        $change = 0;
+    } else {
+        if (!isset($input['amount_paid'])) {
+            echo json_encode(["error" => "amount_paid wajib untuk non-member."]);
+            exit;
+        }
+        $amount_paid = $input['amount_paid'];
+        $diff_hours = ceil(($exit - $entry_time) / 3600);
+        $total_fee = $diff_hours * 3000;
+        $change = $amount_paid - $total_fee;
+    }
 
     // Update log parkir
     $stmt1 = $koneksi->prepare("UPDATE parking_logs SET exit_time = ?, parking_fee = ? WHERE id = ?");
@@ -67,13 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt2->bind_param("iii", $log_id, $amount_paid, $change);
     $stmt2->execute();
 
-    // Catat pembukaan gate otomatis karena pembayaran valid
+    // Catat pembukaan gate otomatis
     $stmt3 = $koneksi->prepare("INSERT INTO gate_logs (vehicle_id, action, source, timestamp) VALUES (?, 'open', 'Payment Verified', NOW())");
     $stmt3->bind_param("i", $vehicle_id);
     $stmt3->execute();
 
     echo json_encode([
-        "message" => "Pembayaran berhasil diproses.",
+        "message" => $is_member ? "Member - tidak dikenakan biaya." : "Pembayaran berhasil diproses.",
         "total_fee" => $total_fee,
         "change" => $change,
         "open_gate" => true
