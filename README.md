@@ -242,18 +242,30 @@ Melihat status kendaraan berdasarkan plat.
 }
 ```
 ## Riwayat Masuk/Keluar Kendaraan
-Melihat status kendaraan berdasarkan plat.
+Melihat semua status kendaraan.
 
-**GET** `tkj-3b.com/opengate/parking-logs.php?plate_number=B 6118 PZZ`  
+**GET** `tkj-3b.com/opengate/parking-logs.php`  
 
 #### Response (200 OK)
 
 ```json
 {
-  "plate_number": "B 6118 PZZ",
-  "entry_time": "2025-06-06 20:10:36",
-  "exit_time": "2025-06-06 12:12:46",
-  "parking_fee": 5000
+  "plate_number": "B 1234 WLG",
+  "is_member": "0",
+  "entry_time": "2025-06-07 20:14:10",
+  "exit_time": null,
+  "parking_fee": null,
+  "img_path": "http://tkj-3b.com/tkj-3b.com/opengate/uploads/B1234WLG_20250607_201410.jpg",
+  "img_path_exit": null
+},
+{
+  "plate_number": "DB 8010 LM",
+  "is_member": "0",
+  "entry_time": "2025-06-07 19:03:00",
+  "exit_time": "2025-06-07 20:08:01",
+  "parking_fee": "6000",
+  "img_path": "http://tkj-3b.com/tkj-3b.com/opengate/uploads/DB8010LM_20250607_190300.jpg",
+  "img_path_exit": "http://tkj-3b.com/tkj-3b.com/opengate/uploads/DB8010LM_exit_20250607_200751.jpg"
 }
 ```
 ## Validasi Pembayaran
@@ -266,7 +278,6 @@ Update jam keluar + hitung total biaya parkir.
 ```json
 {
   "plate_number": "B 1234 WLG",
-  "exit_time": "2025-06-06T19:10:00Z",
   "amount_paid": 5000
 }
 ```
