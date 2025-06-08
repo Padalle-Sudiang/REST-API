@@ -229,16 +229,19 @@ Ambil daftar gate logs.
 ## Riwayat Masuk/Keluar Kendaraan
 Melihat status kendaraan berdasarkan plat.
 
-**GET** `tkj-3b.com/opengate/parking-logs.php?plate_number=B 6118 PZZ`  
+**GET** `tkj-3b.com/opengate/parking-logs.php?plate_number=B 1234 WLG`  
 
 #### Response (200 OK)
 
 ```json
 {
-  "plate_number": "B 6118 PZZ",
-  "entry_time": "2025-06-06 20:10:36",
-  "exit_time": "2025-06-06 12:12:46",
-  "parking_fee": 5000
+  "plate_number": "B 1234 WLG",
+  "is_member": "0",
+  "entry_time": "2025-06-07 20:14:10",
+  "exit_time": null,
+  "parking_fee": null,
+  "img_path": "http://tkj-3b.com/tkj-3b.com/opengate/uploads/B1234WLG_20250607_201410.jpg",
+  "img_path_exit": null
 }
 ```
 ## Riwayat Masuk/Keluar Kendaraan
